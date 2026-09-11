@@ -13,6 +13,7 @@ from app.models.user import User
 from app.schemas.book import (
     BookCreate,
     BookDetailOut,
+    BookFeedOut,
     BookOut,
     HandoffOut,
     PersonOut,
@@ -105,19 +106,38 @@ def create_book(
     return book
 
 
-@router.get("/groups/{group_id}/books", response_model=list[BookOut])
+@router.get("/groups/{group_id}/books", response_model=list[BookFeedOut])
 def list_books(
     group_id: int,
     status: str | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> list[Book]:
+) -> list[BookFeedOut]:
     _require_membership(db, group_id, current_user.id)
     query = select(Book).where(Book.group_id == group_id)
     if status is not None:
         query = query.where(Book.status == status)
     query = query.order_by(Book.created_at.desc())
-    return list(db.scalars(query).all())
+    books = list(db.scalars(query).all())
+
+    order = _rotation_order(db, group_id)
+    holder_ids = {b.current_holder_user_id for b in books}
+    people = _people(db, set(order) | holder_ids)
+
+    feed: list[BookFeedOut] = []
+    for b in books:
+        next_uid: int | None = None
+        if b.status == "circulating" and b.current_holder_user_id in order:
+            next_uid = next_reader(order, b.current_holder_user_id)
+        feed.append(
+            BookFeedOut(
+                **BookOut.model_validate(b).model_dump(),
+                percent=_percent(b.current_page, b.total_pages),
+                current_holder=people.get(b.current_holder_user_id),
+                next_user=people.get(next_uid),
+            )
+        )
+    return feed
 
 
 def _build_detail(db: Session, book: Book) -> BookDetailOut:

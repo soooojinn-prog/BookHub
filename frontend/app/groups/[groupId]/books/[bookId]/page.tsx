@@ -17,6 +17,11 @@ function fmtDate(iso: string | null): string {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 }
 
+function nameOf(detail: BookDetail, id: number | null): string {
+  if (id == null) return "";
+  return detail.rotation_path.find((p) => p.user_id === id)?.nickname ?? `#${id}`;
+}
+
 export default function BookDetailPage() {
   const router = useRouter();
   const params = useParams<{ groupId: string; bookId: string }>();
@@ -71,10 +76,10 @@ export default function BookDetailPage() {
             <div className="flex flex-col gap-8">
               <div>
                 <div className="flex items-baseline gap-3">
-                  <span className="font-en text-[40px] font-semibold" style={{ color: "var(--ink)" }}>{detail.percent}%</span>
+                  <span data-testid="percent" className="font-en text-[40px] font-semibold" style={{ color: "var(--ink)" }}>{detail.percent}%</span>
                   <span className="text-[13px]" style={{ color: "var(--dim)" }}>
                     <b style={{ color: "var(--ink-2)" }}>{detail.current_page}</b> / {detail.total_pages}쪽
-                    {detail.current_holder && <> · 지금 <span style={{ color: "var(--ink)" }}>{detail.current_holder.nickname}</span></>}
+                    {detail.current_holder && <> · 지금 <span data-testid="current-holder" style={{ color: "var(--ink)" }}>{detail.current_holder.nickname}</span></>}
                   </span>
                 </div>
                 <div className="mt-3 h-2 overflow-hidden rounded-md" style={{ background: "var(--bg-3)", border: "1px solid var(--line-2)" }}>
@@ -115,16 +120,16 @@ export default function BookDetailPage() {
                 <div className="mb-3 font-en text-[10.5px] uppercase tracking-[0.18em]" style={{ color: "var(--faint)" }}>이동 기록</div>
                 <ol className="relative flex flex-col gap-1 pl-6" style={{ borderLeft: "0" }}>
                   {history.map((h, i) => (
-                    <li key={i} className="relative py-2">
+                    <li key={i} data-testid="handoff-item" className="relative py-2">
                       <span className="absolute -left-6 top-3 h-3 w-3 rounded-full"
                         style={{ background: i === 0 ? "var(--accent)" : "var(--bg)", border: `2px solid ${i === 0 ? "var(--accent)" : "var(--accent-dim)"}` }} />
                       <div className="flex flex-wrap items-center gap-2 text-[13.5px]">
                         {h.from_user_id != null ? (
                           <span style={{ color: "var(--ink-2)" }}>
-                            #{h.from_user_id} <span style={{ color: "var(--accent)" }}>→</span> {detail.rotation_path.find((p) => p.user_id === h.to_user_id)?.nickname ?? `#${h.to_user_id}`}
+                            {nameOf(detail, h.from_user_id)} <span style={{ color: "var(--accent)" }}>→</span> {nameOf(detail, h.to_user_id)}
                           </span>
                         ) : (
-                          <span style={{ color: "var(--ink)" }}>{detail.rotation_path.find((p) => p.user_id === h.to_user_id)?.nickname ?? `#${h.to_user_id}`} 시작</span>
+                          <span style={{ color: "var(--ink)" }}>{nameOf(detail, h.to_user_id)} 시작</span>
                         )}
                         {h.is_manual && (
                           <span className="rounded-full px-2 py-0.5 text-[10.5px]" style={{ border: "1px solid var(--accent-dim)", color: "var(--accent)" }}>순서 변경</span>

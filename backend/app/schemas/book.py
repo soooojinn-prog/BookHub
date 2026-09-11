@@ -38,6 +38,14 @@ class PersonOut(BaseModel):
     nickname: str
 
 
+class BookFeedOut(BookOut):
+    """List item enriched with backend-computed circulation state (source of truth)."""
+
+    percent: int
+    current_holder: PersonOut | None
+    next_user: PersonOut | None
+
+
 class HandoffOut(BaseModel):
     from_user_id: int | None
     to_user_id: int

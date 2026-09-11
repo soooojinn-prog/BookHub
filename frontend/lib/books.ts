@@ -27,6 +27,12 @@ export type HandoffEvent = {
   created_at: string;
 };
 
+export type BookFeed = BookSummary & {
+  percent: number;
+  current_holder: Person | null;
+  next_user: Person | null;
+};
+
 export type BookDetail = BookSummary & {
   percent: number;
   chooser: Person | null;
@@ -44,9 +50,9 @@ export type BookCreateInput = {
   cover_url?: string | null;
 };
 
-export function listBooks(gid: number | string, status?: "circulating" | "completed"): Promise<BookSummary[]> {
+export function listBooks(gid: number | string, status?: "circulating" | "completed"): Promise<BookFeed[]> {
   const q = status ? `?status=${status}` : "";
-  return apiFetch<BookSummary[]>(`/groups/${gid}/books${q}`);
+  return apiFetch<BookFeed[]>(`/groups/${gid}/books${q}`);
 }
 
 export function createBook(gid: number | string, data: BookCreateInput): Promise<BookSummary> {

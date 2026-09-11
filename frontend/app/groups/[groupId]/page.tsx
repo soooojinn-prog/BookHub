@@ -8,7 +8,7 @@ import AppHeader from "@/components/AppHeader";
 import BookUnveilList from "@/components/BookUnveilList";
 import Starfield from "@/components/Starfield";
 import { ApiError } from "@/lib/api";
-import { listBooks, type BookSummary } from "@/lib/books";
+import { listBooks, type BookFeed } from "@/lib/books";
 import { getGroup } from "@/lib/groups";
 import type { GroupDetail } from "@/lib/types";
 
@@ -18,7 +18,7 @@ export default function GroupHomePage() {
   const router = useRouter();
   const params = useParams<{ groupId: string }>();
   const [group, setGroup] = useState<GroupDetail | null>(null);
-  const [books, setBooks] = useState<BookSummary[]>([]);
+  const [books, setBooks] = useState<BookFeed[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function GroupHomePage() {
                 <h1 className="mt-3 text-[clamp(26px,3.6vw,40px)] font-semibold tracking-[-0.02em]">{group.name}</h1>
                 <p className="mt-2 text-[13px]" style={{ color: "var(--dim)" }}>
                   독서기간 {group.reading_period_days}일 · 초대코드{" "}
-                  <span className="font-en tracking-[0.14em]" style={{ color: "var(--accent)" }}>{group.invite_code}</span>
+                  <span data-testid="invite-code" className="font-en tracking-[0.14em]" style={{ color: "var(--accent)" }}>{group.invite_code}</span>
                 </p>
               </div>
               <Link href={`/groups/${group.id}/books/new`}
@@ -69,7 +69,7 @@ export default function GroupHomePage() {
                   아직 순환 중인 책이 없어요. <Link href={`/groups/${group.id}/books/new`} style={{ color: "var(--accent)" }}>첫 책을 등록</Link>해 순환을 시작해 보세요.
                 </p>
               ) : (
-                <BookUnveilList books={books} members={group.members} groupId={String(group.id)} />
+                <BookUnveilList books={books} groupId={String(group.id)} />
               )}
             </section>
 

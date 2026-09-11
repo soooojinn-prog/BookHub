@@ -3,11 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { coverGradient, type BookSummary } from "@/lib/books";
-import type { Member } from "@/lib/types";
+import { coverGradient, type BookFeed } from "@/lib/books";
 
 type Row = {
-  book: BookSummary;
+  book: BookFeed;
   index: number;
   holder: string;
   next: string;
@@ -16,11 +15,9 @@ type Row = {
 
 export default function BookUnveilList({
   books,
-  members,
   groupId,
 }: {
-  books: BookSummary[];
-  members: Member[];
+  books: BookFeed[];
   groupId: string;
 }) {
   const router = useRouter();
@@ -29,17 +26,19 @@ export default function BookUnveilList({
   const target = useRef({ x: 0, y: 0 });
   const pos = useRef({ x: 0, y: 0 });
 
-  const rows: Row[] = useMemo(() => {
-    const order = [...members].sort((a, b) => a.rotation_position - b.rotation_position);
-    const nameOf = (id: number | null) =>
-      members.find((m) => m.user_id === id)?.nickname ?? "—";
-    return books.map((book, index) => {
-      const holderIdx = order.findIndex((m) => m.user_id === book.current_holder_user_id);
-      const next = holderIdx >= 0 && order.length > 0 ? order[(holderIdx + 1) % order.length].nickname : "—";
-      const percent = book.total_pages > 0 ? Math.round((book.current_page / book.total_pages) * 100) : 0;
-      return { book, index, holder: nameOf(book.current_holder_user_id), next, percent };
-    });
-  }, [books, members]);
+  // Circulation state (current holder / next reader / percent) comes from the
+  // backend feed — the frontend does not recompute rotation logic.
+  const rows: Row[] = useMemo(
+    () =>
+      books.map((book, index) => ({
+        book,
+        index,
+        holder: book.current_holder?.nickname ?? "—",
+        next: book.next_user?.nickname ?? "—",
+        percent: book.percent,
+      })),
+    [books],
+  );
 
   const active = rows.find((r) => r.book.id === activeId) ?? null;
 
@@ -71,6 +70,7 @@ export default function BookUnveilList({
   return (
     <div
       className="bw-wrap relative border-t"
+      data-testid="hero-list"
       data-hovering={activeId !== null}
       style={{ borderColor: "var(--line)" }}
       onMouseLeave={() => setActiveId(null)}
@@ -85,6 +85,7 @@ export default function BookUnveilList({
               onFocus={() => setActiveId(r.book.id)}
               onBlur={() => setActiveId(null)}
               data-active={activeId === r.book.id}
+              data-testid="hero-book"
               className="bw-row"
               style={{ borderColor: "var(--line)" }}
             >

@@ -155,3 +155,15 @@ def test_handoff_only_current_holder(client, nick):
     book = _create_book(client, group["id"]).json()
     _login(client, b["nickname"])  # b is a member but not the current holder
     assert client.post(f"/books/{book['id']}/handoff", json={}).status_code == 403
+
+
+def test_circulating_feed_uses_backend_computed_state(client, nick):
+    owner, b, c, group = _setup_trio(client, nick)
+    _login(client, owner["nickname"])
+    _create_book(client, group["id"])
+    feed = client.get(f"/groups/{group['id']}/books?status=circulating").json()
+    assert len(feed) == 1
+    item = feed[0]
+    assert item["percent"] == 0
+    assert item["current_holder"]["nickname"] == owner["nickname"]
+    assert item["next_user"]["nickname"] == b["nickname"]  # next by rotation, from backend
