@@ -23,3 +23,6 @@ Thumbs.db
 
 # Superpowers / brainstorm scratch
 .superpowers/
+
+# OMC state
+.omc/
