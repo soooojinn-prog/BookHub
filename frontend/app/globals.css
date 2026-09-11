@@ -1,0 +1,62 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+:root {
+  /* Dark gallery · steel + aurora (spec §5) */
+  --bg: #0f1214;
+  --bg-2: #171c1f;
+  --bg-3: #1e2528;
+  --ink: #e8edef;
+  --ink-2: #b4bfc3;
+  --dim: #828d92;
+  --faint: #565f63;
+  --line: #262d30;
+  --line-2: #343d41;
+  --accent: #63d1a3;
+  --accent-dim: #3d9b76;
+  --glow: rgba(99, 209, 163, 0.16);
+
+  --font-kr: "IBM Plex Sans KR", system-ui, sans-serif;
+  --font-en: "Schibsted Grotesk", system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-ink: var(--ink);
+  --color-dim: var(--dim);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-kr);
+  --font-en: var(--font-en);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-kr);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(120% 80% at 82% -8%, rgba(99, 209, 163, 0.08), transparent 55%),
+    radial-gradient(70% 55% at 50% 24%, rgba(92, 158, 205, 0.05), transparent 62%),
+    radial-gradient(90% 60% at 6% 108%, rgba(128, 116, 190, 0.05), transparent 60%);
+  background-attachment: fixed;
+}
+
+canvas.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.font-en {
+  font-family: var(--font-en);
+}
