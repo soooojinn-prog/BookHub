@@ -16,6 +16,7 @@ from app.schemas.book import (
     BookOut,
     HandoffOut,
     PersonOut,
+    ProgressIn,
 )
 from app.services.rotation import next_reader
 
@@ -118,17 +119,7 @@ def list_books(
     return list(db.scalars(query).all())
 
 
-@router.get("/books/{book_id}", response_model=BookDetailOut)
-def book_detail(
-    book_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-) -> BookDetailOut:
-    book = db.get(Book, book_id)
-    if book is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "책을 찾을 수 없어요")
-    _require_membership(db, book.group_id, current_user.id)
-
+def _build_detail(db: Session, book: Book) -> BookDetailOut:
     order = _rotation_order(db, book.group_id)
     next_uid: int | None = None
     if book.status == "circulating" and book.current_holder_user_id in order:
@@ -178,3 +169,41 @@ def book_detail(
         rotation_path=[people[uid] for uid in order if uid in people],
         history=history,
     )
+
+
+@router.get("/books/{book_id}", response_model=BookDetailOut)
+def book_detail(
+    book_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> BookDetailOut:
+    book = db.get(Book, book_id)
+    if book is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "책을 찾을 수 없어요")
+    _require_membership(db, book.group_id, current_user.id)
+    return _build_detail(db, book)
+
+
+@router.patch("/books/{book_id}/progress", response_model=BookDetailOut)
+def update_progress(
+    book_id: int,
+    body: ProgressIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> BookDetailOut:
+    book = db.get(Book, book_id)
+    if book is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "책을 찾을 수 없어요")
+    _require_membership(db, book.group_id, current_user.id)
+    if book.current_holder_user_id != current_user.id:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "현재 이 책을 읽고 있는 사람만 진도를 수정할 수 있어요"
+        )
+    if body.current_page > book.total_pages:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, "현재 페이지가 전체 페이지를 넘을 수 없어요"
+        )
+    book.current_page = body.current_page
+    db.commit()
+    db.refresh(book)
+    return _build_detail(db, book)

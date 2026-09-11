@@ -11,6 +11,10 @@ class BookCreate(BaseModel):
     cover_url: str | None = Field(default=None, max_length=500)
 
 
+class ProgressIn(BaseModel):
+    current_page: int = Field(ge=0)
+
+
 class BookOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

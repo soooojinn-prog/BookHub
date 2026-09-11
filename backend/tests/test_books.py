@@ -53,3 +53,33 @@ def test_book_detail_non_member_forbidden(client, nick):
 
     _register(client, nick + "b")  # switch to a non-member
     assert client.get(f"/books/{book['id']}").status_code == 403
+
+
+def test_update_progress_computes_percent(client, nick):
+    _register(client, nick)
+    group = _create_group(client)
+    book = _create_book(client, group["id"], total_pages=220).json()
+    r = client.patch(f"/books/{book['id']}/progress", json={"current_page": 110})
+    assert r.status_code == 200
+    assert r.json()["percent"] == 50
+    assert r.json()["current_page"] == 110
+
+
+def test_progress_out_of_range_rejected(client, nick):
+    _register(client, nick)
+    group = _create_group(client)
+    book = _create_book(client, group["id"], total_pages=220).json()
+    assert client.patch(f"/books/{book['id']}/progress", json={"current_page": 999}).status_code == 422
+    assert client.patch(f"/books/{book['id']}/progress", json={"current_page": -1}).status_code == 422
+
+
+def test_progress_only_current_holder(client, nick):
+    _register(client, nick)
+    group = _create_group(client)
+    code = group["invite_code"]
+    book = _create_book(client, group["id"]).json()
+
+    _register(client, nick + "b")  # member but not current holder
+    client.post("/groups/join", json={"invite_code": code})
+    r = client.patch(f"/books/{book['id']}/progress", json={"current_page": 10})
+    assert r.status_code == 403
