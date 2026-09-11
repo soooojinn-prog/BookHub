@@ -10,6 +10,11 @@ def _create_group(client, days=14):
     return r.json()
 
 
+def _login(client, nickname):
+    r = client.post("/auth/login", json={"nickname": nickname, "password": "secret1"})
+    assert r.status_code == 200
+
+
 def _create_book(client, gid, **overrides):
     payload = {"title": "아몬드", "author": "손원평", "genre": "장편소설", "total_pages": 220}
     payload.update(overrides)
@@ -83,3 +88,70 @@ def test_progress_only_current_holder(client, nick):
     client.post("/groups/join", json={"invite_code": code})
     r = client.patch(f"/books/{book['id']}/progress", json={"current_page": 10})
     assert r.status_code == 403
+
+
+def _setup_trio(client, nick):
+    """owner + two members joined; returns (owner, b, c, group)."""
+    owner = _register(client, nick)
+    group = _create_group(client)
+    code = group["invite_code"]
+    b = _register(client, nick + "b")
+    client.post("/groups/join", json={"invite_code": code})
+    c = _register(client, nick + "c")
+    client.post("/groups/join", json={"invite_code": code})
+    return owner, b, c, group
+
+
+def test_handoff_advances_to_next(client, nick):
+    owner, b, c, group = _setup_trio(client, nick)
+    _login(client, owner["nickname"])
+    book = _create_book(client, group["id"]).json()
+    r = client.post(f"/books/{book['id']}/handoff", json={})
+    assert r.status_code == 200
+    detail = r.json()
+    assert detail["current_holder"]["user_id"] == b["id"]
+    assert detail["history"][-1]["from_user_id"] == owner["id"]
+    assert detail["history"][-1]["to_user_id"] == b["id"]
+    assert detail["history"][-1]["is_manual"] is False
+
+
+def test_manual_handoff_skips_and_flags(client, nick):
+    owner, b, c, group = _setup_trio(client, nick)
+    _login(client, owner["nickname"])
+    book = _create_book(client, group["id"]).json()
+    r = client.post(f"/books/{book['id']}/handoff", json={"manual_to_user_id": c["id"], "note": "일정상 지아 먼저"})
+    assert r.status_code == 200
+    detail = r.json()
+    assert detail["current_holder"]["user_id"] == c["id"]
+    assert detail["history"][-1]["is_manual"] is True
+
+
+def test_full_loop_completes(client, nick):
+    owner, b, c, group = _setup_trio(client, nick)
+    _login(client, owner["nickname"])
+    book = _create_book(client, group["id"]).json()
+    bid = book["id"]
+
+    _login(client, owner["nickname"])
+    client.post(f"/books/{bid}/handoff", json={})   # owner -> b
+    _login(client, b["nickname"])
+    client.post(f"/books/{bid}/handoff", json={})   # b -> c
+    _login(client, c["nickname"])
+    r = client.post(f"/books/{bid}/handoff", json={})  # c -> owner (chooser) => complete
+    assert r.status_code == 200
+    assert r.json()["status"] == "completed"
+    assert r.json()["completed_at"] is not None
+
+    # completed book cannot be handed off again
+    assert client.post(f"/books/{bid}/handoff", json={}).status_code == 409
+    # and shows up in the completed feed
+    completed = client.get(f"/groups/{group['id']}/books?status=completed").json()
+    assert any(x["id"] == bid for x in completed)
+
+
+def test_handoff_only_current_holder(client, nick):
+    owner, b, c, group = _setup_trio(client, nick)
+    _login(client, owner["nickname"])
+    book = _create_book(client, group["id"]).json()
+    _login(client, b["nickname"])  # b is a member but not the current holder
+    assert client.post(f"/books/{book['id']}/handoff", json={}).status_code == 403

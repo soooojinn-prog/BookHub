@@ -18,7 +18,8 @@ from app.schemas.book import (
     PersonOut,
     ProgressIn,
 )
-from app.services.rotation import next_reader
+from app.schemas.handoff import HandoffIn
+from app.services.rotation import completes_loop, next_reader
 
 router = APIRouter(tags=["books"])
 
@@ -204,6 +205,59 @@ def update_progress(
             status.HTTP_422_UNPROCESSABLE_ENTITY, "현재 페이지가 전체 페이지를 넘을 수 없어요"
         )
     book.current_page = body.current_page
+    db.commit()
+    db.refresh(book)
+    return _build_detail(db, book)
+
+
+@router.post("/books/{book_id}/handoff", response_model=BookDetailOut)
+def handoff(
+    book_id: int,
+    body: HandoffIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> BookDetailOut:
+    book = db.get(Book, book_id)
+    if book is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "책을 찾을 수 없어요")
+    _require_membership(db, book.group_id, current_user.id)
+    if book.status != "circulating":
+        raise HTTPException(status.HTTP_409_CONFLICT, "이미 완료된 책이에요")
+    if book.current_holder_user_id != current_user.id:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "현재 이 책을 읽고 있는 사람만 전달할 수 있어요"
+        )
+
+    order = _rotation_order(db, book.group_id)
+    try:
+        next_uid = next_reader(order, current_user.id, manual_to=body.manual_to_user_id)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
+
+    is_manual = body.manual_to_user_id is not None
+    db.add(
+        HandoffEvent(
+            book_id=book.id,
+            from_user_id=current_user.id,
+            to_user_id=next_uid,
+            page_at_handoff=book.current_page,
+            is_manual=is_manual,
+            note=body.note,
+        )
+    )
+
+    now = datetime.now(timezone.utc)
+    book.current_holder_user_id = next_uid
+    book.current_page = 0
+    if completes_loop(next_uid, book.chooser_user_id):
+        book.status = "completed"
+        book.completed_at = now
+        book.due_date = None
+    else:
+        group = db.get(Group, book.group_id)
+        book.started_at = now
+        book.due_date = now + timedelta(days=group.reading_period_days)
+
     db.commit()
     db.refresh(book)
     return _build_detail(db, book)
