@@ -4,3 +4,4 @@ from app.models.group import Group  # noqa: F401
 from app.models.group_member import GroupMember  # noqa: F401
 from app.models.book import Book  # noqa: F401
 from app.models.handoff_event import HandoffEvent  # noqa: F401
+from app.models.review import Review  # noqa: F401
