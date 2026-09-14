@@ -86,10 +86,10 @@ test("core circulation flow across two users", async ({ browser }) => {
   await pageB.getByRole("button", { name: /다음 사람에게 전달/ }).click();
   await expect(pageB.getByText(/한 바퀴 완료/)).toBeVisible();
 
-  // book leaves the circulating Hero
+  // book leaves the circulating Hero and moves into the completed 서재
   await pageB.goto(groupUrl);
-  await expect(pageB.getByText(title)).toHaveCount(0);
   await expect(pageB.getByTestId("hero-list")).toHaveCount(0);
+  await expect(pageB.getByTestId("cover-view").getByText(title)).toBeVisible();
 
   await ctxA.close();
   await ctxB.close();

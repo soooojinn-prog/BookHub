@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import AppHeader from "@/components/AppHeader";
+import Bookcase from "@/components/Bookcase";
 import BookUnveilList from "@/components/BookUnveilList";
 import Starfield from "@/components/Starfield";
 import { ApiError } from "@/lib/api";
@@ -19,13 +20,19 @@ export default function GroupHomePage() {
   const params = useParams<{ groupId: string }>();
   const [group, setGroup] = useState<GroupDetail | null>(null);
   const [books, setBooks] = useState<BookFeed[]>([]);
+  const [completed, setCompleted] = useState<BookFeed[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([getGroup(params.groupId), listBooks(params.groupId, "circulating")])
-      .then(([g, b]) => {
+    Promise.all([
+      getGroup(params.groupId),
+      listBooks(params.groupId, "circulating"),
+      listBooks(params.groupId, "completed"),
+    ])
+      .then(([g, b, done]) => {
         setGroup(g);
         setBooks(b);
+        setCompleted(done);
       })
       .catch((err) => {
         if (err instanceof ApiError && err.status === 401) router.replace("/login");
@@ -70,6 +77,24 @@ export default function GroupHomePage() {
                 </p>
               ) : (
                 <BookUnveilList books={books} groupId={String(group.id)} />
+              )}
+            </section>
+
+            <section className="mt-16">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-en text-[11px] font-medium uppercase tracking-[0.2em]" style={{ color: "var(--faint)" }}>
+                  완료된 책 · 서재 {completed.length > 0 && `· ${completed.length}`}
+                </h2>
+                <Link href={`/groups/${group.id}/stats`} className="text-[12.5px]" style={{ color: "var(--accent)" }}>
+                  통계 보기 →
+                </Link>
+              </div>
+              {completed.length === 0 ? (
+                <p className="text-[14px]" style={{ color: "var(--ink-2)" }}>
+                  아직 완독한 책이 없어요. 한 바퀴를 다 돌면 여기 서재에 쌓입니다.
+                </p>
+              ) : (
+                <Bookcase books={completed} groupId={String(group.id)} />
               )}
             </section>
 

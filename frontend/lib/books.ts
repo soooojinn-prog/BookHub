@@ -27,10 +27,16 @@ export type HandoffEvent = {
   created_at: string;
 };
 
+export type ReviewBrief = { nickname: string; one_liner: string };
+
 export type BookFeed = BookSummary & {
   percent: number;
   current_holder: Person | null;
   next_user: Person | null;
+  avg_rating: number | null;
+  review_count: number;
+  recent_review: ReviewBrief | null;
+  readers: Person[];
 };
 
 export type BookDetail = BookSummary & {
