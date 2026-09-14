@@ -2,7 +2,11 @@ import path from "node:path";
 
 import { defineConfig, devices } from "@playwright/test";
 
+const isCI = !!process.env.CI;
+
 export default defineConfig({
+  forbidOnly: isCI,
+  retries: isCI ? 1 : 0,
   testDir: "./e2e",
   timeout: 120_000,
   expect: { timeout: 15_000 },
@@ -22,13 +26,13 @@ export default defineConfig({
       cwd: path.resolve(__dirname, "../backend"),
       url: "http://localhost:8000/health",
       timeout: 120_000,
-      reuseExistingServer: true,
+      reuseExistingServer: !isCI,
     },
     {
       command: "npm run build && npm run start",
       url: "http://localhost:3000",
       timeout: 240_000,
-      reuseExistingServer: true,
+      reuseExistingServer: !isCI,
     },
   ],
 });

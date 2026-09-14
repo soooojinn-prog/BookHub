@@ -148,7 +148,7 @@ export default function BookDetailPage() {
               </div>
 
               <div>
-                <ReviewSection bookId={detail.id} meId={meId} />
+                <ReviewSection bookId={detail.id} meId={meId} completed={detail.status === "completed"} />
               </div>
             </div>
           </div>

@@ -17,7 +17,15 @@ function Stars({ value }: { value: number }) {
   );
 }
 
-export default function ReviewSection({ bookId, meId }: { bookId: number; meId: number | null }) {
+export default function ReviewSection({
+  bookId,
+  meId,
+  completed,
+}: {
+  bookId: number;
+  meId: number | null;
+  completed: boolean;
+}) {
   const [reviews, setReviews] = useState<Review[] | null>(null);
   const [rating, setRating] = useState(5);
   const [oneLiner, setOneLiner] = useState("");
@@ -91,7 +99,13 @@ export default function ReviewSection({ bookId, meId }: { bookId: number; meId: 
         </ul>
       )}
 
-      {meId != null && (
+      {meId != null && !completed && (
+        <p className="mt-4 text-[12.5px]" style={{ color: "var(--faint)" }}>
+          완독(한 바퀴 완료) 후에 별점·한줄평을 남길 수 있어요.
+        </p>
+      )}
+
+      {meId != null && completed && (
         <form onSubmit={submit} className="mt-5 flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-2 text-[12.5px]" style={{ color: "var(--dim)" }}>
             별점

@@ -4,13 +4,20 @@ def _register(client, nickname):
     return r.json()
 
 
-def _book(client):
+def _make_book(client, complete):
     group = client.post("/groups", json={"name": "g", "reading_period_days": 14}).json()
     book = client.post(
         f"/groups/{group['id']}/books",
         json={"title": "데미안", "author": "헤세", "genre": "소설", "total_pages": 220},
     ).json()
+    if complete:
+        # solo group: one handoff returns to chooser -> completed
+        client.post(f"/books/{book['id']}/handoff", json={})
     return group, book
+
+
+def _book(client):
+    return _make_book(client, complete=True)
 
 
 def test_upsert_review(client, nick):
@@ -42,3 +49,10 @@ def test_review_non_member_forbidden(client, nick):
     _, book = _book(client)
     _register(client, nick + "b")  # non-member
     assert client.post(f"/books/{book['id']}/reviews", json={"rating": 4, "one_liner": "x"}).status_code == 403
+
+
+def test_review_rejected_on_circulating_book(client, nick):
+    _register(client, nick)
+    _, book = _make_book(client, complete=False)  # still circulating
+    r = client.post(f"/books/{book['id']}/reviews", json={"rating": 4, "one_liner": "아직 읽는 중"})
+    assert r.status_code == 409

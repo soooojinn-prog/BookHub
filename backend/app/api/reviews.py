@@ -28,7 +28,11 @@ def upsert_review(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> ReviewOut:
-    _load_book_with_membership(db, book_id, current_user.id)
+    book = _load_book_with_membership(db, book_id, current_user.id)
+    if book.status != "completed":
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "완독(한 바퀴 완료)한 책에만 별점·한줄평을 남길 수 있어요"
+        )
     review = db.scalar(
         select(Review).where(Review.book_id == book_id, Review.user_id == current_user.id)
     )
