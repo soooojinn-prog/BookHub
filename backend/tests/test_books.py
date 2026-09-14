@@ -167,3 +167,26 @@ def test_circulating_feed_uses_backend_computed_state(client, nick):
     assert item["percent"] == 0
     assert item["current_holder"]["nickname"] == owner["nickname"]
     assert item["next_user"]["nickname"] == b["nickname"]  # next by rotation, from backend
+
+
+def test_completed_feed_includes_reviews_and_readers(client, nick):
+    owner, b, c, group = _setup_trio(client, nick)
+    _login(client, owner["nickname"])
+    book = _create_book(client, group["id"]).json()
+    bid = book["id"]
+
+    _login(client, owner["nickname"]); client.post(f"/books/{bid}/handoff", json={})
+    _login(client, b["nickname"]); client.post(f"/books/{bid}/handoff", json={})
+    _login(client, c["nickname"]); client.post(f"/books/{bid}/handoff", json={})
+
+    _login(client, owner["nickname"]); client.post(f"/books/{bid}/reviews", json={"rating": 5, "one_liner": "성장의 밤"})
+    _login(client, b["nickname"]); client.post(f"/books/{bid}/reviews", json={"rating": 4, "one_liner": "좋았다"})
+    _login(client, c["nickname"]); client.post(f"/books/{bid}/reviews", json={"rating": 3, "one_liner": "무난"})
+
+    feed = client.get(f"/groups/{group['id']}/books?status=completed").json()
+    item = next(x for x in feed if x["id"] == bid)
+    assert item["avg_rating"] == 4.0
+    assert item["review_count"] == 3
+    assert item["recent_review"] is not None
+    reader_names = {p["nickname"] for p in item["readers"]}
+    assert {owner["nickname"], b["nickname"], c["nickname"]} <= reader_names

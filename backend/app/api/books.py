@@ -10,6 +10,7 @@ from app.models.group import Group
 from app.models.group_member import GroupMember
 from app.models.handoff_event import HandoffEvent
 from app.models.user import User
+from app.models.review import Review
 from app.schemas.book import (
     BookCreate,
     BookDetailOut,
@@ -18,6 +19,7 @@ from app.schemas.book import (
     HandoffOut,
     PersonOut,
     ProgressIn,
+    ReviewBrief,
 )
 from app.schemas.handoff import HandoffIn
 from app.services.rotation import completes_loop, next_reader
@@ -119,22 +121,69 @@ def list_books(
         query = query.where(Book.status == status)
     query = query.order_by(Book.created_at.desc())
     books = list(db.scalars(query).all())
+    if not books:
+        return []
 
+    book_ids = [b.id for b in books]
     order = _rotation_order(db, group_id)
-    holder_ids = {b.current_holder_user_id for b in books}
-    people = _people(db, set(order) | holder_ids)
+
+    # reviews grouped per book (avg, count, most-recent one-liner)
+    review_rows = db.execute(
+        select(Review.book_id, Review.user_id, Review.rating, Review.one_liner, Review.created_at)
+        .where(Review.book_id.in_(book_ids))
+        .order_by(Review.created_at)
+    ).all()
+    reviews_by_book: dict[int, list] = {}
+    for row in review_rows:
+        reviews_by_book.setdefault(row.book_id, []).append(row)
+
+    # readers (everyone the book was handed to) per book
+    handoff_rows = db.execute(
+        select(HandoffEvent.book_id, HandoffEvent.to_user_id).where(
+            HandoffEvent.book_id.in_(book_ids)
+        )
+    ).all()
+    readers_by_book: dict[int, list[int]] = {}
+    for bid, uid in handoff_rows:
+        lst = readers_by_book.setdefault(bid, [])
+        if uid not in lst:
+            lst.append(uid)
+
+    needed_ids = set(order)
+    needed_ids |= {b.current_holder_user_id for b in books}
+    for lst in readers_by_book.values():
+        needed_ids |= set(lst)
+    for rows in reviews_by_book.values():
+        needed_ids |= {r.user_id for r in rows}
+    people = _people(db, needed_ids)
 
     feed: list[BookFeedOut] = []
     for b in books:
         next_uid: int | None = None
         if b.status == "circulating" and b.current_holder_user_id in order:
             next_uid = next_reader(order, b.current_holder_user_id)
+
+        brs = reviews_by_book.get(b.id, [])
+        avg_rating = round(sum(r.rating for r in brs) / len(brs), 1) if brs else None
+        recent = None
+        for r in reversed(brs):
+            if r.one_liner:
+                person = people.get(r.user_id)
+                recent = ReviewBrief(nickname=person.nickname if person else "?", one_liner=r.one_liner)
+                break
+
+        readers = [people[uid] for uid in readers_by_book.get(b.id, []) if uid in people]
+
         feed.append(
             BookFeedOut(
                 **BookOut.model_validate(b).model_dump(),
                 percent=_percent(b.current_page, b.total_pages),
                 current_holder=people.get(b.current_holder_user_id),
                 next_user=people.get(next_uid),
+                avg_rating=avg_rating,
+                review_count=len(brs),
+                recent_review=recent,
+                readers=readers,
             )
         )
     return feed

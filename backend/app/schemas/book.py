@@ -38,12 +38,21 @@ class PersonOut(BaseModel):
     nickname: str
 
 
+class ReviewBrief(BaseModel):
+    nickname: str
+    one_liner: str
+
+
 class BookFeedOut(BookOut):
-    """List item enriched with backend-computed circulation state (source of truth)."""
+    """List item enriched with backend-computed circulation + record state (source of truth)."""
 
     percent: int
     current_holder: PersonOut | None
     next_user: PersonOut | None
+    avg_rating: float | None
+    review_count: int
+    recent_review: ReviewBrief | None
+    readers: list[PersonOut]
 
 
 class HandoffOut(BaseModel):
