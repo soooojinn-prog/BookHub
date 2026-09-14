@@ -305,17 +305,37 @@ export default function BookUnveilList({
         }
         @media (max-width: 640px) {
           .bw-row {
-            padding: 22px 6px;
-            gap: 12px;
+            grid-template-columns: auto 1fr;
+            column-gap: 12px;
+            row-gap: 8px;
+            padding: 20px 6px;
           }
           .bw-row::before {
             inset: 2px -8px;
           }
           .bw-title {
-            font-size: 21px;
+            font-size: 22px;
           }
+          /* meta drops to its own full-width line under the title, left-aligned */
           .bw-meta {
-            font-size: 11px;
+            grid-column: 1 / -1;
+            text-align: left;
+            font-size: 12px;
+            white-space: normal;
+          }
+          .bw-st {
+            display: inline;
+            margin: 0 6px 0 0;
+          }
+          .bw-next {
+            display: inline;
+            margin: 0 0 0 8px;
+          }
+          .bw-row[data-active="true"] {
+            transform: none;
+          }
+          .bw-row[data-active="true"] .bw-title {
+            transform: none;
           }
         }
       `}</style>

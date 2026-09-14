@@ -44,24 +44,24 @@ export default function GroupHomePage() {
     <>
       <Starfield />
       <AppHeader />
-      <main className="relative z-10 mx-auto max-w-[1120px] px-8 py-14">
+      <main className="relative z-10 mx-auto max-w-[1120px] px-5 sm:px-8 py-14">
         {error && <p role="alert" style={{ color: "#e88" }}>{error}</p>}
         {!error && !group && <p style={{ color: "var(--dim)" }}>불러오는 중…</p>}
         {group && (
           <>
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="min-w-0">
                 <span className="font-en text-[11px] font-medium uppercase tracking-[0.3em]" style={{ color: "var(--accent)" }}>
                   Reading circle
                 </span>
-                <h1 className="mt-3 text-[clamp(26px,3.6vw,40px)] font-semibold tracking-[-0.02em]">{group.name}</h1>
+                <h1 className="mt-3 text-[clamp(26px,3.6vw,40px)] font-semibold tracking-[-0.02em] [overflow-wrap:anywhere]">{group.name}</h1>
                 <p className="mt-2 text-[13px]" style={{ color: "var(--dim)" }}>
                   독서기간 {group.reading_period_days}일 · 초대코드{" "}
                   <span data-testid="invite-code" className="font-en tracking-[0.14em]" style={{ color: "var(--accent)" }}>{group.invite_code}</span>
                 </p>
               </div>
               <Link href={`/groups/${group.id}/books/new`}
-                className="rounded-lg px-4 py-2.5 text-[14px] font-medium"
+                className="inline-flex min-h-[44px] w-full items-center justify-center rounded-lg px-4 py-3 text-[14px] font-medium sm:w-auto"
                 style={{ background: "var(--accent)", color: "#0c1512" }}>
                 + 책 등록
               </Link>

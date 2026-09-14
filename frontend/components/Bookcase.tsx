@@ -125,7 +125,8 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
           font: inherit;
           font-size: 13px;
           font-weight: 500;
-          padding: 6px 16px;
+          min-height: 44px;
+          padding: 8px 18px;
           border-radius: 6px;
           cursor: pointer;
           font-family: var(--font-en);

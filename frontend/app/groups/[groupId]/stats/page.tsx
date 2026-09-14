@@ -29,7 +29,7 @@ export default function StatsPage() {
     <>
       <Starfield />
       <AppHeader />
-      <main className="relative z-10 mx-auto max-w-[1120px] px-8 py-14">
+      <main className="relative z-10 mx-auto max-w-[1120px] px-5 sm:px-8 py-14">
         <Link href={`/groups/${params.groupId}`} className="text-[13px]" style={{ color: "var(--dim)" }}>
           ← 모임으로
         </Link>

@@ -15,7 +15,7 @@ export default function AppHeader({ nickname }: { nickname?: string }) {
 
   return (
     <header className="relative z-10 border-b" style={{ borderColor: "var(--line)" }}>
-      <div className="mx-auto flex max-w-[1120px] items-center gap-4 px-8 py-5">
+      <div className="mx-auto flex max-w-[1120px] items-center gap-4 px-5 sm:px-8 py-5">
         <Link href="/groups" className="text-[18px] font-semibold tracking-[0.04em]">
           책<span style={{ color: "var(--accent)" }}>◔</span>바퀴
         </Link>
@@ -27,7 +27,7 @@ export default function AppHeader({ nickname }: { nickname?: string }) {
         )}
         <button
           onClick={onLogout}
-          className="rounded-full px-3 py-1.5 text-[12px]"
+          className="inline-flex min-h-[44px] items-center rounded-full px-4 py-2 text-[12.5px]"
           style={{ border: "1px solid var(--line-2)", color: "var(--dim)" }}
         >
           로그아웃

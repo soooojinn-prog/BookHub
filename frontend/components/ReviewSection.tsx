@@ -122,7 +122,7 @@ export default function ReviewSection({
               className="rounded-lg px-3 py-2.5 text-[14px] outline-none" style={inputStyle} />
           </label>
           <button type="submit" disabled={busy}
-            className="rounded-lg px-4 py-2.5 text-[14px] font-medium disabled:opacity-60"
+            className="rounded-lg px-4 py-3 text-[14px] font-medium disabled:opacity-60"
             style={{ background: "var(--accent)", color: "#0c1512" }}>
             {mine ? "수정" : "남기기"}
           </button>

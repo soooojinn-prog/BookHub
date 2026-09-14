@@ -85,6 +85,21 @@ body > main {
   max-width: 100%;
 }
 
+/* Mobile form ergonomics + touch targets */
+@media (max-width: 640px) {
+  /* >=16px avoids iOS focus auto-zoom; taller controls are easier to tap */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+    min-height: 44px;
+  }
+  /* min-height only — layout buttons (grid/flex, already tall) are unaffected */
+  button {
+    min-height: 44px;
+  }
+}
+
 .font-en {
   font-family: var(--font-en);
 }

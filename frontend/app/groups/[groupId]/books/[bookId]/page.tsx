@@ -49,7 +49,7 @@ export default function BookDetailPage() {
     <>
       <Starfield />
       <AppHeader />
-      <main className="relative z-10 mx-auto max-w-[1080px] px-8 py-14">
+      <main className="relative z-10 mx-auto max-w-[1080px] px-5 sm:px-8 py-14">
         <Link href={`/groups/${params.groupId}`} className="text-[13px]" style={{ color: "var(--dim)" }}>
           ← 모임으로
         </Link>
@@ -57,12 +57,12 @@ export default function BookDetailPage() {
         {!error && !detail && <p className="mt-4" style={{ color: "var(--dim)" }}>불러오는 중…</p>}
 
         {detail && (
-          <div className="mt-6 grid gap-8 md:grid-cols-[280px_1fr]">
+          <div className="mt-6 grid grid-cols-1 gap-8 md:grid-cols-[280px_1fr]">
             {/* book */}
-            <div>
-              <div className="relative flex h-[320px] flex-col justify-end rounded-[3px_10px_10px_3px] p-5 text-[#eef3f4]"
+            <div className="min-w-0">
+              <div className="relative flex h-[220px] flex-col justify-end overflow-hidden rounded-[3px_10px_10px_3px] p-5 text-[#eef3f4] md:h-[320px]"
                 style={{ background: coverGradient(detail.id), borderLeft: "5px solid rgba(0,0,0,0.3)", boxShadow: "0 26px 44px rgba(0,0,0,0.5)" }}>
-                <div className="text-[22px] font-semibold leading-tight">{detail.title}</div>
+                <div className="text-[22px] font-semibold leading-tight [overflow-wrap:anywhere]">{detail.title}</div>
                 <div className="mt-1.5 text-[12px] opacity-85">{detail.author}</div>
               </div>
               <dl className="mt-5 grid grid-cols-[auto_1fr] gap-y-2 text-[13px]">
@@ -74,7 +74,7 @@ export default function BookDetailPage() {
             </div>
 
             {/* circulation */}
-            <div className="flex flex-col gap-8">
+            <div className="flex min-w-0 flex-col gap-8">
               <div>
                 <div className="flex items-baseline gap-3">
                   <span data-testid="percent" className="font-en text-[40px] font-semibold" style={{ color: "var(--ink)" }}>{detail.percent}%</span>

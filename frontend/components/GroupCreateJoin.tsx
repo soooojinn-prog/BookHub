@@ -86,7 +86,7 @@ export default function GroupCreateJoin({ onChanged }: { onChanged: (g: Group) =
         <button
           type="submit"
           disabled={busy}
-          className="mt-4 rounded-lg px-4 py-2.5 text-[14px] font-medium disabled:opacity-60"
+          className="mt-4 rounded-lg px-4 py-3 text-[14px] font-medium disabled:opacity-60"
           style={{ background: "var(--accent)", color: "#0c1512" }}
         >
           만들기
@@ -115,7 +115,7 @@ export default function GroupCreateJoin({ onChanged }: { onChanged: (g: Group) =
         <button
           type="submit"
           disabled={busy}
-          className="mt-4 rounded-lg px-4 py-2.5 text-[14px] font-medium disabled:opacity-60"
+          className="mt-4 rounded-lg px-4 py-3 text-[14px] font-medium disabled:opacity-60"
           style={{ border: "1px solid var(--accent)", color: "var(--accent)" }}
         >
           가입하기

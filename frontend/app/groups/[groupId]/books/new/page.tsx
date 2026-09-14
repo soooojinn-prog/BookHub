@@ -12,7 +12,7 @@ export default function NewBookPage() {
     <>
       <Starfield />
       <AppHeader />
-      <main className="relative z-10 mx-auto max-w-[1120px] px-8 py-16">
+      <main className="relative z-10 mx-auto max-w-[1120px] px-5 sm:px-8 py-16">
         <span className="font-en text-[11px] font-medium uppercase tracking-[0.3em]" style={{ color: "var(--accent)" }}>
           Add a book
         </span>

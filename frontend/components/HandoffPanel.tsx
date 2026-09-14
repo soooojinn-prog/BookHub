@@ -17,6 +17,7 @@ export default function HandoffPanel({
   const [page, setPage] = useState<number | "">(detail.current_page);
   const [manualTo, setManualTo] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [ok, setOk] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const others = detail.rotation_path.filter((p) => p.user_id !== detail.current_holder_user_id);
@@ -40,10 +41,12 @@ export default function HandoffPanel({
   async function saveProgress(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setOk(null);
     setBusy(true);
     try {
       const d = await updateProgress(detail.id, Number(page || 0));
       onChanged(d);
+      setOk(`진도 저장됨 · ${d.percent}%`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "진도 저장에 실패했어요");
     } finally {
@@ -53,6 +56,7 @@ export default function HandoffPanel({
 
   async function doHandoff() {
     setError(null);
+    setOk(null);
     setBusy(true);
     try {
       const body = manualTo ? { manual_to_user_id: Number(manualTo) } : {};
@@ -79,7 +83,7 @@ export default function HandoffPanel({
         </label>
         <span className="pb-3 text-[13px]" style={{ color: "var(--faint)" }}>/ {detail.total_pages}쪽</span>
         <button type="submit" disabled={busy}
-          className="rounded-lg px-4 py-2.5 text-[13px] disabled:opacity-60"
+          className="rounded-lg px-4 py-3 text-[13px] disabled:opacity-60"
           style={{ border: "1px solid var(--line-2)", color: "var(--ink-2)" }}>
           진도 저장
         </button>
@@ -92,7 +96,7 @@ export default function HandoffPanel({
           다음 사람에게 전달 →
         </button>
         <select aria-label="다음 독자 바꾸기" value={manualTo} onChange={(e) => setManualTo(e.target.value)}
-          className="rounded-lg px-3 py-3 text-[13px] outline-none" style={inputStyle}>
+          className="w-full min-w-0 max-w-full rounded-lg px-3 py-3 text-[13px] outline-none sm:w-auto" style={inputStyle}>
           <option value="">다음 독자: 기본 순서 ({detail.next_user?.nickname ?? "—"})</option>
           {others.map((p) => (
             <option key={p.user_id} value={p.user_id}>다음 독자 바꾸기 → {p.nickname}</option>
@@ -100,6 +104,7 @@ export default function HandoffPanel({
         </select>
       </div>
 
+      {ok && <p className="text-[13px]" style={{ color: "var(--accent)" }}>{ok}</p>}
       {error && <p role="alert" className="text-[13px]" style={{ color: "#e88" }}>{error}</p>}
     </div>
   );

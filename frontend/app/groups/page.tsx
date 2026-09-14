@@ -31,7 +31,7 @@ export default function GroupsPage() {
 
   if (loading) {
     return (
-      <main className="relative z-10 mx-auto max-w-[1120px] px-8 py-24" style={{ color: "var(--dim)" }}>
+      <main className="relative z-10 mx-auto max-w-[1120px] px-5 sm:px-8 py-24" style={{ color: "var(--dim)" }}>
         불러오는 중…
       </main>
     );
@@ -41,7 +41,7 @@ export default function GroupsPage() {
     <>
       <Starfield />
       <AppHeader nickname={user?.nickname} />
-      <main className="relative z-10 mx-auto max-w-[1120px] px-8 py-16">
+      <main className="relative z-10 mx-auto max-w-[1120px] px-5 sm:px-8 py-16">
         <span
           className="font-en text-[11px] font-medium uppercase tracking-[0.3em]"
           style={{ color: "var(--accent)" }}
