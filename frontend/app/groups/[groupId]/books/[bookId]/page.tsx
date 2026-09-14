@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import AppHeader from "@/components/AppHeader";
 import HandoffPanel from "@/components/HandoffPanel";
+import ReviewSection from "@/components/ReviewSection";
 import Starfield from "@/components/Starfield";
 import { ApiError } from "@/lib/api";
 import { me } from "@/lib/auth";
@@ -144,6 +145,10 @@ export default function BookDetailPage() {
                     </li>
                   ))}
                 </ol>
+              </div>
+
+              <div>
+                <ReviewSection bookId={detail.id} meId={meId} />
               </div>
             </div>
           </div>

@@ -238,7 +238,9 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
           align-items: flex-end;
           gap: 5px;
           min-height: 210px;
-          padding-bottom: 0;
+          padding: 40px 2px 0;
+          overflow-x: auto;
+          scrollbar-width: thin;
         }
         .bc-spine {
           position: relative;
@@ -253,8 +255,19 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
           transform-origin: bottom center;
         }
         .bc-spine:hover {
-          transform: translateY(-30px);
+          transform: translateY(-22px);
           z-index: 5;
+        }
+        @media (max-width: 640px) {
+          .bc-faceRow {
+            gap: 20px;
+          }
+          .bc-case {
+            padding: 22px 16px 0;
+          }
+          .bc-ledge {
+            margin: 0 -16px;
+          }
         }
         .bc-txt {
           position: absolute;

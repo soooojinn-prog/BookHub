@@ -187,6 +187,8 @@ export default function BookUnveilList({
           font-size: clamp(22px, 4vw, 40px);
           line-height: 1.05;
           letter-spacing: -0.015em;
+          min-width: 0;
+          overflow-wrap: anywhere;
           transition: transform 0.5s cubic-bezier(0.16, 0.8, 0.2, 1);
         }
         .bw-row[data-active="true"] .bw-title {
@@ -300,6 +302,21 @@ export default function BookUnveilList({
           height: 100%;
           background: var(--accent);
           border-radius: 3px;
+        }
+        @media (max-width: 640px) {
+          .bw-row {
+            padding: 22px 6px;
+            gap: 12px;
+          }
+          .bw-row::before {
+            inset: 2px -8px;
+          }
+          .bw-title {
+            font-size: 21px;
+          }
+          .bw-meta {
+            font-size: 11px;
+          }
         }
       `}</style>
     </div>

@@ -4,11 +4,11 @@ import type { GroupStats } from "@/lib/stats";
 
 const memberColors = ["#5f8298", "#4f9d82", "#6f7bb2", "#8a6f9c", "#4d7f95", "#5a5a83"];
 
-function Tile({ k, v, u }: { k: string; v: string | number; u?: string }) {
+function Tile({ k, v, u, t }: { k: string; v: string | number; u?: string; t?: string }) {
   return (
     <div className="sd-tile">
       <div className="sd-k">{k}</div>
-      <div className="sd-v">
+      <div className="sd-v" data-testid={t}>
         {v}
         {u && <span className="sd-u">{u}</span>}
       </div>
@@ -24,10 +24,10 @@ export default function StatsDashboard({ stats }: { stats: GroupStats }) {
   return (
     <div className="sd">
       <div className="sd-tiles">
-        <Tile k="완독한 책" v={stats.books_completed} u="권" />
-        <Tile k="쌓인 페이지" v={stats.pages_total.toLocaleString()} u="쪽" />
-        <Tile k="평균 별점" v={stats.avg_rating ?? "—"} u={stats.avg_rating != null ? "/5" : undefined} />
-        <Tile k="책바퀴 회전수" v={stats.loops} u="바퀴" />
+        <Tile k="완독한 책" v={stats.books_completed} u="권" t="stat-books" />
+        <Tile k="쌓인 페이지" v={stats.pages_total.toLocaleString()} u="쪽" t="stat-pages" />
+        <Tile k="평균 별점" v={stats.avg_rating ?? "—"} u={stats.avg_rating != null ? "/5" : undefined} t="stat-avg" />
+        <Tile k="책바퀴 회전수" v={stats.loops} u="바퀴" t="stat-loops" />
       </div>
 
       <div className="sd-charts">

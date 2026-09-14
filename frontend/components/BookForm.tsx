@@ -63,8 +63,8 @@ export default function BookForm({ groupId }: { groupId: string }) {
         <input aria-label="저자" value={author} onChange={(e) => setAuthor(e.target.value)} maxLength={120}
           className="rounded-lg px-3 py-3 text-[15px] outline-none" style={inputStyle} />
       </label>
-      <div className="flex gap-4">
-        <label className="flex flex-1 flex-col gap-2 text-[13px]" style={{ color: "var(--dim)" }}>
+      <div className="flex flex-wrap gap-4">
+        <label className="flex min-w-0 flex-1 flex-col gap-2 text-[13px]" style={{ color: "var(--dim)", minWidth: 140 }}>
           장르
           <input aria-label="장르" value={genre} onChange={(e) => setGenre(e.target.value)} maxLength={60}
             className="rounded-lg px-3 py-3 text-[15px] outline-none" style={inputStyle} />
