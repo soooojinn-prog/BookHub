@@ -31,3 +31,6 @@ Thumbs.db
 frontend/test-results/
 frontend/playwright-report/
 frontend/blob-report/
+
+# extreme-data seed fixture (local QA)
+frontend/e2e/extreme-seed.json

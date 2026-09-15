@@ -61,6 +61,7 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
               <button
                 key={b.id}
                 className="bc-cbook"
+                data-testid="cover-book"
                 onClick={() => router.push(`/groups/${groupId}/books/${b.id}`)}
               >
                 <div className="bc-cap">
@@ -89,6 +90,7 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
               <button
                 key={b.id}
                 className="bc-spine"
+                data-testid="shelf-book"
                 style={{ width: widthFor(b.total_pages), background: coverGradient(b.id) }}
                 onClick={() => router.push(`/groups/${groupId}/books/${b.id}`)}
               >
