@@ -85,8 +85,11 @@ body > main {
   max-width: 100%;
 }
 
-/* Mobile form ergonomics + touch targets */
-@media (max-width: 640px) {
+/* Mobile form ergonomics + touch targets.
+   Width alone is not enough: a phone in landscape (e.g. 932px) leaves the
+   640px bucket while still being the device that zooms on focus, so any
+   touch pointer opts in at every width. */
+@media (max-width: 640px), (hover: none), (pointer: coarse) {
   /* >=16px avoids iOS focus auto-zoom; taller controls are easier to tap */
   input,
   select,
