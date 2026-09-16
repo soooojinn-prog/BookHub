@@ -7,7 +7,7 @@ import { listReviews, upsertReview, type Review } from "@/lib/reviews";
 
 function Stars({ value }: { value: number }) {
   return (
-    <span aria-label={`별점 ${value}점`} style={{ color: "var(--accent)", letterSpacing: 1 }}>
+    <span role="img" aria-label={`별점 ${value}점`} style={{ color: "var(--accent)", letterSpacing: 1 }}>
       {[1, 2, 3, 4, 5].map((i) => (
         <span key={i} style={{ color: i <= value ? "var(--accent)" : "var(--line-2)" }}>
           ★
