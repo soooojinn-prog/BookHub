@@ -161,8 +161,13 @@ export default function BookUnveilList({
           position: relative;
           z-index: 1;
         }
-        .bw-wrap[data-hovering="true"] .bw-row:not([data-active="true"]) {
-          opacity: 0.3;
+        /* Dimming the other rows is a hover affordance. On touch the row that
+           was just tapped takes focus, which would dim the whole list for the
+           moment before the detail page opens. */
+        @media (hover: hover) and (pointer: fine) {
+          .bw-wrap[data-hovering="true"] .bw-row:not([data-active="true"]) {
+            opacity: 0.3;
+          }
         }
         .bw-row[data-active="true"] {
           transform: scale(1.02);
