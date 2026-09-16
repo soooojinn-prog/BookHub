@@ -36,7 +36,7 @@ MVP 기능 개발과 모바일 QA를 마치고 **배포 직전 상태로 고정�
 
 | 검증 | 결과 |
 |---|---|
-| backend `pytest` | 44 passed — 백엔드 최종 변경 커밋 `c4de866` 기준, 이후 `backend/` 무변경 |
+| backend `pytest` | 44 passed |
 | frontend `vitest` | 19 passed |
 | `next build` | 클린 |
 | Playwright E2E (chromium) | 9 passed |
