@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import CoverImage from "@/components/CoverImage";
 import { coverGradient, type BookFeed, type Person } from "@/lib/books";
 
 const memberColors = ["#5f8298", "#4f9d82", "#6f7bb2", "#8a6f9c", "#4d7f95", "#5a5a83"];
@@ -73,6 +74,7 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
                   </div>
                 </div>
                 <div className="bc-cov" style={{ background: coverGradient(b.id) }}>
+                  <CoverImage url={b.cover_url} seed={b.id} />
                   <span className="bc-glare" />
                   {b.recent_review && (
                     <div className="bc-review">

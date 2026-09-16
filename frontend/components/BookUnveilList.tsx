@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import CoverImage from "@/components/CoverImage";
 import { coverGradient, type BookFeed } from "@/lib/books";
 
 type Row = {
@@ -111,6 +112,7 @@ export default function BookUnveilList({
         {active && (
           <div className="bw-pv-inner">
             <div className="bw-pv-cover" style={{ background: coverGradient(active.index) }}>
+              <CoverImage url={active.book.cover_url} seed={active.book.id} scrim />
               <span className="bw-pv-t">{active.book.title}</span>
               <span className="bw-pv-a">{active.book.author}</span>
             </div>
@@ -269,11 +271,15 @@ export default function BookUnveilList({
           padding: 18px;
         }
         .bw-pv-t {
+          position: relative;
+          z-index: 1;
           font-weight: 600;
           font-size: 19px;
           line-height: 1.25;
         }
         .bw-pv-a {
+          position: relative;
+          z-index: 1;
           font-size: 11px;
           opacity: 0.82;
           margin-top: 4px;
