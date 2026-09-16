@@ -48,7 +48,15 @@ body {
     radial-gradient(120% 80% at 82% -8%, rgba(99, 209, 163, 0.08), transparent 55%),
     radial-gradient(70% 55% at 50% 24%, rgba(92, 158, 205, 0.05), transparent 62%),
     radial-gradient(90% 60% at 6% 108%, rgba(128, 116, 190, 0.05), transparent 60%);
-  background-attachment: fixed;
+}
+
+/* A fixed background repaints the whole viewport on every scroll frame. Mobile
+   Chromium already downgrades it to `scroll`; iOS Safari does not, so keep the
+   effect for pointer devices and let phones scroll the gradient with the page. */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    background-attachment: fixed;
+  }
 }
 
 /* Keyboard focus (a11y) */
