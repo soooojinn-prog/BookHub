@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import AppHeader from "@/components/AppHeader";
+import CoverImage from "@/components/CoverImage";
 import HandoffPanel from "@/components/HandoffPanel";
 import ReviewSection from "@/components/ReviewSection";
 import Starfield from "@/components/Starfield";
@@ -60,10 +61,17 @@ export default function BookDetailPage() {
           <div className="mt-6 grid grid-cols-1 gap-8 md:grid-cols-[280px_1fr]">
             {/* book */}
             <div className="min-w-0">
-              <div className="relative flex h-[220px] flex-col justify-end overflow-hidden rounded-[3px_10px_10px_3px] p-5 text-[#eef3f4] md:h-[320px]"
+              {/* Phones get a shorter cover so 진도/전달 sit higher up the page;
+                  640px and above keep the original proportions. */}
+              <div data-testid="detail-cover"
+                className="relative flex h-[clamp(130px,40vw,168px)] flex-col justify-end overflow-hidden rounded-[3px_10px_10px_3px] p-5 text-[#eef3f4] sm:h-[220px] md:h-[320px]"
                 style={{ background: coverGradient(detail.id), borderLeft: "5px solid rgba(0,0,0,0.3)", boxShadow: "0 26px 44px rgba(0,0,0,0.5)" }}>
-                <div className="text-[22px] font-semibold leading-tight [overflow-wrap:anywhere]">{detail.title}</div>
-                <div className="mt-1.5 text-[12px] opacity-85">{detail.author}</div>
+                <CoverImage url={detail.cover_url} seed={detail.id} scrim eager />
+                {/* The box bottom-aligns, so an overlong title used to lose its
+                    opening lines off the top. Clamped instead: the title starts
+                    where it should and trails off with an ellipsis. */}
+                <div className="relative z-10 line-clamp-3 text-[17px] font-semibold leading-tight [overflow-wrap:anywhere] sm:line-clamp-4 sm:text-[22px]">{detail.title}</div>
+                <div className="relative z-10 mt-1.5 text-[12px] opacity-85">{detail.author}</div>
               </div>
               <dl className="mt-5 grid grid-cols-[auto_1fr] gap-y-2 text-[13px]">
                 <dt style={{ color: "var(--dim)" }}>장르&nbsp;&nbsp;</dt><dd className="text-right">{detail.genre || "—"}</dd>
