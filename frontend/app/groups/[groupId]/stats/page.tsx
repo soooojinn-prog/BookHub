@@ -30,7 +30,7 @@ export default function StatsPage() {
       <Starfield />
       <AppHeader />
       <main className="relative z-10 mx-auto max-w-[1120px] px-5 sm:px-8 py-14">
-        <Link href={`/groups/${params.groupId}`} className="text-[13px]" style={{ color: "var(--dim)" }}>
+        <Link href={`/groups/${params.groupId}`} className="-my-2.5 inline-flex min-h-[44px] items-center text-[13px]" style={{ color: "var(--dim)" }}>
           ← 모임으로
         </Link>
         <h1 className="mt-4 text-[clamp(24px,3.4vw,36px)] font-semibold tracking-[-0.02em]">

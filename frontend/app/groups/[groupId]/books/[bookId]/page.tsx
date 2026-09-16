@@ -50,7 +50,7 @@ export default function BookDetailPage() {
       <Starfield />
       <AppHeader />
       <main className="relative z-10 mx-auto max-w-[1080px] px-5 sm:px-8 py-14">
-        <Link href={`/groups/${params.groupId}`} className="text-[13px]" style={{ color: "var(--dim)" }}>
+        <Link href={`/groups/${params.groupId}`} className="-my-2.5 inline-flex min-h-[44px] items-center text-[13px]" style={{ color: "var(--dim)" }}>
           ← 모임으로
         </Link>
         {error && <p role="alert" className="mt-4" style={{ color: "#e88" }}>{error}</p>}

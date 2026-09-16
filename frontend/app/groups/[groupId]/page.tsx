@@ -85,7 +85,7 @@ export default function GroupHomePage() {
                 <h2 className="font-en text-[11px] font-medium uppercase tracking-[0.2em]" style={{ color: "var(--faint)" }}>
                   완료된 책 · 서재 {completed.length > 0 && `· ${completed.length}`}
                 </h2>
-                <Link href={`/groups/${group.id}/stats`} className="text-[12.5px]" style={{ color: "var(--accent)" }}>
+                <Link href={`/groups/${group.id}/stats`} className="-my-2.5 inline-flex min-h-[44px] items-center text-[12.5px]" style={{ color: "var(--accent)" }}>
                   통계 보기 →
                 </Link>
               </div>
