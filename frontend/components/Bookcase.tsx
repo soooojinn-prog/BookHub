@@ -199,11 +199,6 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
           box-shadow: 0 16px 26px rgba(0, 0, 0, 0.5), inset -7px 0 14px rgba(0, 0, 0, 0.24);
           transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s;
         }
-        .bc-cbook:hover .bc-cov {
-          transform: translateY(-12px);
-          box-shadow: 0 30px 46px rgba(0, 0, 0, 0.6), 0 0 40px -12px var(--glow),
-            inset -7px 0 14px rgba(0, 0, 0, 0.24);
-        }
         .bc-glare {
           position: absolute;
           inset: 0;
@@ -221,9 +216,6 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
           background: linear-gradient(180deg, transparent, rgba(9, 13, 15, 0.86) 45%);
           opacity: 0;
           transition: opacity 0.35s;
-        }
-        .bc-cbook:hover .bc-review {
-          opacity: 1;
         }
         .bc-q {
           font-size: 12.5px;
@@ -243,6 +235,9 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
           min-height: 210px;
           padding: 40px 2px 0;
           overflow-x: auto;
+          /* keep the swipe inside the shelf: on iOS/Android an overscroll at the
+             edge of a horizontal scroller triggers browser back-navigation */
+          overscroll-behavior-x: contain;
           scrollbar-width: thin;
         }
         .bc-spine {
@@ -256,10 +251,6 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
           box-shadow: inset -7px 0 13px rgba(0, 0, 0, 0.3), inset 4px 0 6px rgba(255, 255, 255, 0.1);
           transition: transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
           transform-origin: bottom center;
-        }
-        .bc-spine:hover {
-          transform: translateY(-22px);
-          z-index: 5;
         }
         @media (max-width: 640px) {
           .bc-faceRow {
@@ -298,13 +289,13 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
           top: 16px;
         }
         .bc-tip {
+          display: none;
           position: absolute;
           bottom: 100%;
           left: 50%;
           transform: translate(-50%, 8px);
           margin-bottom: 10px;
           width: 210px;
-          display: flex;
           flex-direction: column;
           gap: 4px;
           background: rgba(23, 28, 31, 0.7);
@@ -317,10 +308,6 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
           transition: opacity 0.28s, transform 0.28s;
           z-index: 9;
           color: var(--ink);
-        }
-        .bc-spine:hover .bc-tip {
-          opacity: 1;
-          transform: translate(-50%, 0);
         }
         .bc-tt {
           font-weight: 600;
@@ -341,6 +328,31 @@ export default function Bookcase({ books, groupId }: { books: BookFeed[]; groupI
           color: var(--ink-2);
           margin-top: 4px;
           line-height: 1.45;
+        }
+        /* Hover affordances are gated on a real pointer: on touch the browser
+           latches :hover after a tap, so an ungated lift stays stuck on the
+           last-tapped book. Mobile reaches the same content by tapping through
+           to the detail page. */
+        @media (hover: hover) and (pointer: fine) {
+          .bc-cbook:hover .bc-cov {
+            transform: translateY(-12px);
+            box-shadow: 0 30px 46px rgba(0, 0, 0, 0.6), 0 0 40px -12px var(--glow),
+              inset -7px 0 14px rgba(0, 0, 0, 0.24);
+          }
+          .bc-cbook:hover .bc-review {
+            opacity: 1;
+          }
+          .bc-spine:hover {
+            transform: translateY(-22px);
+            z-index: 5;
+          }
+          .bc-tip {
+            display: flex;
+          }
+          .bc-spine:hover .bc-tip {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
         }
       `}</style>
       <style jsx global>{`
