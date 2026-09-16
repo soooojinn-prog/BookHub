@@ -50,7 +50,7 @@ async function step(page: Page, label: string) {
   await shot(page, label);
 }
 
-test("mobile journey: A and B complete a loop end to end on a phone", async ({ browser }) => {
+test("mobile journey: A and B complete a loop end to end on a phone", async ({ browser, baseURL }) => {
   test.setTimeout(240_000);
   const stamp = unique();
   const nickA = `pa_${stamp}`;
@@ -119,6 +119,9 @@ test("mobile journey: A and B complete a loop end to end on a phone", async ({ b
   await A.getByLabel("제목").fill(title);
   await A.getByLabel("저자").fill("아주 긴 이름을 가진 어느 작가님");
   await A.getByLabel("전체 페이지").fill("320");
+  // a same-origin asset stands in for a real cover, so the shelf below exercises
+  // the image path without depending on an outside host
+  await A.getByLabel("표지 URL").fill(`${baseURL}/favicon.ico`);
   await A.getByRole("button", { name: "책 등록" }).tap();
   await A.waitForURL(/\/groups\/\d+$/, { timeout: 60_000 });
 
@@ -190,6 +193,8 @@ test("mobile journey: A and B complete a loop end to end on a phone", async ({ b
   await A.goto(groupUrl);
   await expect(A.getByTestId("hero-list")).toHaveCount(0);
   await expect(A.getByTestId("cover-view").getByText(title)).toBeVisible();
+  // 완료 서재 Cover View also paints the real cover art
+  await expect(A.getByTestId("cover-book").first().locator("img")).toHaveCount(1);
   await step(A, "14-shelf-cover");
   await measure(A.getByRole("tab", { name: "Bookshelf" }), "서재 · Cover/Bookshelf 토글");
 
