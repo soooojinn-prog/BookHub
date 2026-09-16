@@ -73,6 +73,11 @@ body {
 canvas.starfield {
   position: fixed;
   inset: 0;
+  /* A replaced element does not stretch from `inset: 0` alone, and sizing it
+     from JS would mean re-sizing on every iOS URL-bar resize. CSS keeps it
+     covering the viewport while the bitmap resolution stays put. */
+  width: 100%;
+  height: 100%;
   z-index: 0;
   pointer-events: none;
 }
