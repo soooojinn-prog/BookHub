@@ -19,7 +19,20 @@ export default defineConfig({
     actionTimeout: 20_000,
     trace: "on-first-retry",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    // iOS Safari engine pass. Opt-in (PW_WEBKIT=1) so default and CI runs keep
+    // their current cost and do not fail where webkit is not installed.
+    ...(process.env.PW_WEBKIT
+      ? [
+          {
+            name: "webkit-mobile",
+            use: { ...devices["iPhone 13"] },
+            testMatch: /mobile-(flow|perf)\.spec\.ts/,
+          },
+        ]
+      : []),
+  ],
   webServer: [
     {
       command: ".venv\\Scripts\\python -m uvicorn app.main:app --port 8000 --log-level warning",
