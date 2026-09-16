@@ -89,6 +89,23 @@ export function handoff(
   });
 }
 
+/**
+ * A cover URL we are willing to put in an <img src>, or null.
+ *
+ * cover_url is free text a member pasted, so it can be empty, whitespace, a
+ * broken string, or a non-http scheme. Anything that is not an absolute
+ * http(s) URL falls back to the gradient rather than producing a broken image.
+ */
+export function coverSrc(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url.trim());
+    return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed.href : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Deterministic cool gradient per book (steel/aurora family), no external image. */
 export function coverGradient(seed: number): string {
   const palettes = [
