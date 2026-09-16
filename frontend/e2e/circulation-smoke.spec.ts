@@ -88,14 +88,14 @@ test("full MVP flow: circulation, completion, reviews, stats", async ({ browser 
   await expect(pageB.getByText(/한 바퀴 완료/)).toBeVisible();
 
   // B: leave a review (rating 5) on the completed book
-  await pageB.getByLabel("별점").selectOption("5");
+  await pageB.getByLabel("별점", { exact: true }).selectOption("5");
   await pageB.getByLabel("한줄평").fill("성장의 밤");
   await pageB.getByRole("button", { name: "남기기" }).click();
   await expect(pageB.getByTestId("review-list")).toContainText(nickB);
 
   // A: leave a review (rating 3) -> average becomes 4
   await pageA.goto(bookUrl);
-  await pageA.getByLabel("별점").selectOption("3");
+  await pageA.getByLabel("별점", { exact: true }).selectOption("3");
   await pageA.getByLabel("한줄평").fill("무난했다");
   await pageA.getByRole("button", { name: "남기기" }).click();
   await expect(pageA.getByTestId("avg-rating")).toHaveText("4");
